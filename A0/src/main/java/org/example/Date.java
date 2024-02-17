@@ -50,7 +50,15 @@ public class Date  {
     public String toString() {
         return day + "/" + month + "/" + year;
     }
-
+    public int getYear(){
+        return this.year;
+    }
+    public int getMonth(){
+        return this.month;
+    }
+    public int getDay(){
+        return this.day;
+    }
     private static int daysOfMonth(int month, int year) {
         if (month < 1 || month > 12)
             throw new IllegalArgumentException("Invalid value for month");
