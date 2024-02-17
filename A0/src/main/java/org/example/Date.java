@@ -1,8 +1,9 @@
 package org.example;
 
+import java.util.Comparator;
 import java.util.Objects;
 
-public class Date  {
+public class Date implements Comparable<Date> {
     private final int day;
     private final int month;
     private final int year;
@@ -58,6 +59,17 @@ public class Date  {
     }
     public int getDay(){
         return this.day;
+    }
+    public int compareTo(Date other){
+        if(this.year == other.getYear()){
+            if(this.month == other.getMonth()){
+                return this.day - other.getDay();
+            } else {
+                return this.month - other.getMonth();
+            }
+        } else {
+            return this.year - other.getYear();
+        }
     }
     private static int daysOfMonth(int month, int year) {
         if (month < 1 || month > 12)
