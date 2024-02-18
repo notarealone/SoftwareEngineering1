@@ -19,13 +19,17 @@ public class Membership {
         return start.compareTo(this.expiration) <= 0 && end.compareTo(this.beginning) >= 0;
     }
 
+    public Date getBeginning(){ return this.beginning; }
+
+    public Date getExpiration(){ return this.expiration; }
+
     public int countDays(){ //TODO : find a more optimized solution!
-        int num = 0;
+        int counter = 0;
         Date temp = this.beginning;
         while(temp.compareTo(this.expiration) != 0){
             temp = temp.nextDay();
-            num++;
+            counter++;
         }
-        return num;
+        return counter;
     }
 }
