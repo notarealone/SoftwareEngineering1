@@ -1,6 +1,7 @@
 package org.example;
 
 import java.util.ArrayList;
+import java.util.function.Function;
 
 public class Player {
     private final String name;
@@ -22,4 +23,6 @@ public class Player {
         }
         this.membershipHistory.add(membership);
     }
+
+    public Function<String, Integer> countMembershipDays = (teamName) -> this.membershipHistory.stream() .filter(membership -> membership.getTeamName().equals(teamName)) .mapToInt(Membership::countDays) .sum();
 }
