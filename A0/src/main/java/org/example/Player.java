@@ -4,13 +4,14 @@ import java.util.ArrayList;
 
 public class Player {
     private final String name;
-    private ArrayList<Membership> membershipHistory = new ArrayList<Membership>();
+    private ArrayList<Membership> membershipHistory;
 
     public Player(String playerName){
         if(playerName.isEmpty())
             throw new IllegalArgumentException("Name should not be an empty string");
 
         this.name = playerName;
+        this.membershipHistory = new ArrayList<Membership>();
     }
 
     public void addMembership(Membership membership){
@@ -19,6 +20,6 @@ public class Player {
                 throw new IllegalArgumentException("New Membership has conflict with previous ones");
             }
         }
-        membershipHistory.add(membership);
+        this.membershipHistory.add(membership);
     }
 }
