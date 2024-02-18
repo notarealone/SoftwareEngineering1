@@ -19,6 +19,7 @@ public class Membership {
         return start.compareTo(this.expiration) <= 0 && end.compareTo(this.beginning) >= 0;
     }
 
+    public String getTeamName(){ return this.teamName; }
     public Date getBeginning(){ return this.beginning; }
 
     public Date getExpiration(){ return this.expiration; }
