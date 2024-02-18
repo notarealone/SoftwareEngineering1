@@ -8,12 +8,17 @@ public class Player {
 
     public Player(String playerName){
         if(playerName.isEmpty())
-            throw new IllegalArgumentException("Name should not be empty");
+            throw new IllegalArgumentException("Name should not be an empty string");
 
         this.name = playerName;
     }
 
     public void addMembership(Membership membership){
-        //TODO : Handle membership overlaps (probably by adding a compareTo method for Membership)
+        for(Membership mem : this.membershipHistory) {
+            if(membership.isOverlap(mem.getBeginning(), mem.getExpiration())){
+                throw new IllegalArgumentException("New Membership has conflict with previous ones");
+            }
+        }
+        membershipHistory.add(membership);
     }
 }
