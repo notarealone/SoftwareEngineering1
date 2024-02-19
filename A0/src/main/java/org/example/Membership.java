@@ -31,6 +31,6 @@ public class Membership {
             temp = temp.nextDay();
             counter++;
         }
-        return counter;
+        return (counter != 0) ? counter+1 : 0;
     }
 }
