@@ -15,6 +15,8 @@ public class Player {
         this.membershipHistory = new ArrayList<Membership>();
     }
 
+    public String getName(){ return this.name; }
+
     public void addMembership(Membership membership){
         for(Membership mem : this.membershipHistory) {
             if(membership.isOverlap(mem.getBeginning(), mem.getExpiration())){
