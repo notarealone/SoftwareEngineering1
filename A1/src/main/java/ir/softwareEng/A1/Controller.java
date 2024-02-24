@@ -16,7 +16,7 @@ public class Controller {
     public Controller(JmsTemplate jmsTemplate){
         this.jmsTemplate = jmsTemplate;
     }
-    
+
     @JmsListener(destination = "INQ")
     public void getMsg(String content){
         String[] inputMsg = content.split("\\s+");
@@ -26,11 +26,11 @@ public class Controller {
     public void respond(String[] inputMsg){
         switch (inputMsg[0]){
             case "DEPOSIT" :
-                this.manager.deposit(inputMsg[1], Integer.parseInt(inputMsg[2]));
+                manager.deposit(inputMsg[1], Integer.parseInt(inputMsg[2]));
                 jmsTemplate.convertAndSend("OUTQ", "0 Deposit successful");
                 break;
             case "WITHDRAW" :
-                switch(this.manager.withdraw(inputMsg[1], Integer.parseInt(inputMsg[2]))){
+                switch(manager.withdraw(inputMsg[1], Integer.parseInt(inputMsg[2]))){
                     case 0 :
                         jmsTemplate.convertAndSend("OUTQ", "0 Withdraw successful");
                         break;
@@ -43,7 +43,7 @@ public class Controller {
                 }
                 break;
             case "BALANCE" :
-                int accountBalance = this.manager.getBalance(inputMsg[1]);
+                int accountBalance = manager.getBalance(inputMsg[1]);
                 if(accountBalance < 0) {
                     jmsTemplate.convertAndSend("OUTQ", "2 Unknown account number");
                 }
