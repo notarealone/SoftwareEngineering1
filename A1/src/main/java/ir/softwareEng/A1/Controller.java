@@ -16,10 +16,7 @@ public class Controller {
     public Controller(JmsTemplate jmsTemplate){
         this.jmsTemplate = jmsTemplate;
     }
-
-    public void setManager(Accounting mng) {
-        manager = mng;
-    }
+    
     @JmsListener(destination = "INQ")
     public void getMsg(String content){
         String[] inputMsg = content.split("\\s+");
