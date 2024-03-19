@@ -3,6 +3,7 @@ package ir.ramtung.tinyme.domain;
 import ir.ramtung.tinyme.config.MockedJMSTestConfig;
 import ir.ramtung.tinyme.domain.entity.*;
 import ir.ramtung.tinyme.domain.service.Matcher;
+import ir.ramtung.tinyme.messaging.request.DeleteOrderRq;
 import ir.ramtung.tinyme.messaging.request.EnterOrderRq;
 import ir.ramtung.tinyme.messaging.request.OrderEntryType;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,8 +35,8 @@ public class BrokerCreditTest {
     @BeforeEach
     void setupOrderBook() {
         security = Security.builder().build();
-        sellerBroker = Broker.builder().credit(100_000_000L).build();
-        buyerBroker = Broker.builder().credit(100_000_000L).build();
+        sellerBroker = Broker.builder().credit(100_000_000L).brokerId(0).build();
+        buyerBroker = Broker.builder().credit(100_000_000L).brokerId(1).build();
         shareholder = Shareholder.builder().build();
         shareholder.incPosition(security, 100_000);
         orderBook = security.getOrderBook();
@@ -118,5 +119,56 @@ public class BrokerCreditTest {
         assertThat(matchResult.outcome()).isEqualTo(MatchResult.notEnoughPositions().outcome());
         assertThat(buyerBroker.getCredit()).isEqualTo(100_000_000L);
         assertThat(sellerBroker.getCredit()).isEqualTo(100_000_000L);
+    }
+    @Test
+    void updated_buy_order_matches_with_multiple_sell_orders(){
+        try {
+            security.updateOrder(EnterOrderRq.createNewOrderRq(1, security.getIsin(), 1, LocalDateTime.now(), Side.BUY, 450, 15810, 1, 0, 0), matcher);
+            assertThat(buyerBroker.getCredit()).isEqualTo(100_000_000L + (304 * 15700) - (350*15800 + 100*15810));
+            assertThat(sellerBroker.getCredit()).isEqualTo(100_000_000L + ((350*15800) + (100*15810)));
+        } catch (Exception ex) {
+            //Not possible
+        }
+    }
+    @Test
+    void updated_sell_order_fails_and_gets_canceled(){
+        try {
+            security.updateOrder(EnterOrderRq.createNewOrderRq(1, security.getIsin(), 6, LocalDateTime.now(), Side.SELL, 101_000, 15810, 0, 0, 0), matcher);
+            assertThat(buyerBroker.getCredit()).isEqualTo(100_000_000L);
+            assertThat(sellerBroker.getCredit()).isEqualTo(100_000_000L);
+        } catch (Exception ex) {
+            //Not possible
+        }
+    }
+    @Test //TODO : fails!
+    void updating_buy_order_fails_after_partially_matching_so_the_original_order_stays(){
+        try {
+            MatchResult matchResult = security.updateOrder(EnterOrderRq.createNewOrderRq(1, security.getIsin(), 1, LocalDateTime.now(), Side.BUY, 100_000, 15800, 1, 0, 0), matcher);
+            assertThat(matchResult.outcome()).isEqualTo(MatchResult.notEnoughCredit().outcome());
+            assertThat(buyerBroker.getCredit()).isEqualTo(100_000_000L);
+            assertThat(sellerBroker.getCredit()).isEqualTo(100_000_000L);
+        } catch (Exception ex) {
+            //Not possible
+        }
+    }
+    @Test
+    void buy_order_gets_canceled(){
+        try {
+            security.deleteOrder(new DeleteOrderRq(1, security.getIsin(), Side.BUY, 1));
+            assertThat(buyerBroker.getCredit()).isEqualTo(100_000_000L + (304 * 15700));
+            assertThat(sellerBroker.getCredit()).isEqualTo(100_000_000L);
+        } catch (Exception ex) {
+            //Not possible
+        }
+    }
+    @Test
+    void sell_order_gets_canceled(){
+        try {
+            security.deleteOrder(new DeleteOrderRq(1, security.getIsin(), Side.SELL, 7));
+            assertThat(buyerBroker.getCredit()).isEqualTo(100_000_000L);
+            assertThat(sellerBroker.getCredit()).isEqualTo(100_000_000L);
+        } catch (Exception ex) {
+            //Not possible
+        }
     }
 }
