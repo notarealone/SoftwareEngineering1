@@ -70,14 +70,14 @@ public class BrokerCreditTest {
         assertThat(sellerBroker.getCredit()).isEqualTo(100_000_000L + (250 * 15800));
     }
     @Test
-    void new_buy_order_matches_completely_with_two_top_sell_orders(){
+    void new_buy_order_matches_completely_with_multiple_sell_orders(){
         Order order = new Order(11, security, Side.BUY, 350 + 285, 15810, buyerBroker, shareholder);
         MatchResult matchResult = matcher.execute(order);
         assertThat(buyerBroker.getCredit()).isEqualTo(100_000_000L - ((350 * 15800) + (285 * 15810)));
         assertThat(sellerBroker.getCredit()).isEqualTo(100_000_000L + ((350 * 15800) + (285 * 15810)));
     }
     @Test
-    void new_buy_order_matches_partially_with_two_top_sell_orders(){
+    void new_buy_order_matches_partially_with_multiple_sell_orders(){
         Order order = new Order(11, security, Side.BUY, 350 + 250, 15810, buyerBroker, shareholder);
         MatchResult matchResult = matcher.execute(order);
         assertThat(buyerBroker.getCredit()).isEqualTo(100_000_000L - ((350 * 15800) + (250 * 15810)));
@@ -91,7 +91,7 @@ public class BrokerCreditTest {
         assertThat(sellerBroker.getCredit()).isEqualTo(100_000_000L + (350 * 15800));
     }
     @Test
-    void new_buy_order_matches_partially_with_two_top_sell_orders_with_remainder(){
+    void new_buy_order_matches_partially_with_multiple_sell_orders_with_remainder(){
         Order order = new Order(11, security, Side.BUY, 350 + 1085 + 100, 15810, buyerBroker, shareholder);
         MatchResult matchResult = matcher.execute(order);
         assertThat(buyerBroker.getCredit()).isEqualTo(100_000_000L - ((350 * 15800) + (1085 * 15810) + (100 * 15810)));
