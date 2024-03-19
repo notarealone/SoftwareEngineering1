@@ -20,7 +20,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@Import(MockedJMSTestConfig.class)
 @DirtiesContext
 public class BrokerCreditTest {
     private Security security;
