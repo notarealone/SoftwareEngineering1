@@ -54,43 +54,43 @@ public class BrokerCreditTest {
     @Test
     void new_buy_order_matches_completely_with_first_sell_order(){
         Order order = new Order(11, security, Side.BUY, 350, 15800, buyerBroker, shareholder);
-        MatchResult matchResult = matcher.match(order);
+        MatchResult matchResult = matcher.execute(order);
         assertThat(buyerBroker.getCredit()).isEqualTo(100_000_000L - (350 * 15800));
         assertThat(sellerBroker.getCredit()).isEqualTo(100_000_000L + (350 * 15800));
     }
     @Test
     void new_buy_order_matches_partially_with_first_sell_order(){
         Order order = new Order(11, security, Side.BUY, 250, 15800, buyerBroker, shareholder);
-        MatchResult matchResult = matcher.match(order);
+        MatchResult matchResult = matcher.execute(order);
         assertThat(buyerBroker.getCredit()).isEqualTo(100_000_000L - (250 * 15800));
         assertThat(sellerBroker.getCredit()).isEqualTo(100_000_000L + (250 * 15800));
     }
     @Test
     void new_buy_order_matches_completely_with_two_top_sell_orders(){
         Order order = new Order(11, security, Side.BUY, 350 + 285, 15810, buyerBroker, shareholder);
-        MatchResult matchResult = matcher.match(order);
+        MatchResult matchResult = matcher.execute(order);
         assertThat(buyerBroker.getCredit()).isEqualTo(100_000_000L - ((350 * 15800) + (285 * 15810)));
         assertThat(sellerBroker.getCredit()).isEqualTo(100_000_000L + ((350 * 15800) + (285 * 15810)));
     }
     @Test
     void new_buy_order_matches_partially_with_two_top_sell_orders(){
         Order order = new Order(11, security, Side.BUY, 350 + 250, 15810, buyerBroker, shareholder);
-        MatchResult matchResult = matcher.match(order);
+        MatchResult matchResult = matcher.execute(order);
         assertThat(buyerBroker.getCredit()).isEqualTo(100_000_000L - ((350 * 15800) + (250 * 15810)));
         assertThat(sellerBroker.getCredit()).isEqualTo(100_000_000L + ((350 * 15800) + (250 * 15810)));
     }
-    @Test //TODO : fail because of remainder?
+    @Test
     void new_buy_order_matches_partially_with_first_sell_order_with_remainder(){
         Order order = new Order(11, security, Side.BUY, 350 + 100, 15800, buyerBroker, shareholder);
-        MatchResult matchResult = matcher.match(order);
+        MatchResult matchResult = matcher.execute(order);
         assertThat(buyerBroker.getCredit()).isEqualTo(100_000_000L - ((350 * 15800) + (100 * 15800)));
         assertThat(sellerBroker.getCredit()).isEqualTo(100_000_000L + (350 * 15800));
     }
-    @Test //TODO : fail because of remainder?
+    @Test
     void new_buy_order_matches_partially_with_two_top_sell_orders_with_remainder(){
-        Order order = new Order(11, security, Side.BUY, 350 + 285 + 100, 15810, buyerBroker, shareholder);
-        MatchResult matchResult = matcher.match(order);
-        assertThat(buyerBroker.getCredit()).isEqualTo(100_000_000L - ((350 * 15800) + (285 * 15810) + (100 * 15810)));
-        assertThat(sellerBroker.getCredit()).isEqualTo(100_000_000L + ((350 * 15800) + (285 * 15810)));
+        Order order = new Order(11, security, Side.BUY, 350 + 1085 + 100, 15810, buyerBroker, shareholder);
+        MatchResult matchResult = matcher.execute(order);
+        assertThat(buyerBroker.getCredit()).isEqualTo(100_000_000L - ((350 * 15800) + (1085 * 15810) + (100 * 15810)));
+        assertThat(sellerBroker.getCredit()).isEqualTo(100_000_000L + ((350 * 15800) + (1085 * 15810)));
     }
 }
