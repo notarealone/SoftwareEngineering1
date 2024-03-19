@@ -3,6 +3,8 @@ package ir.ramtung.tinyme.domain;
 import ir.ramtung.tinyme.config.MockedJMSTestConfig;
 import ir.ramtung.tinyme.domain.entity.*;
 import ir.ramtung.tinyme.domain.service.Matcher;
+import ir.ramtung.tinyme.messaging.request.EnterOrderRq;
+import ir.ramtung.tinyme.messaging.request.OrderEntryType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -92,5 +95,28 @@ public class BrokerCreditTest {
         MatchResult matchResult = matcher.execute(order);
         assertThat(buyerBroker.getCredit()).isEqualTo(100_000_000L - ((350 * 15800) + (1085 * 15810) + (100 * 15810)));
         assertThat(sellerBroker.getCredit()).isEqualTo(100_000_000L + ((350 * 15800) + (1085 * 15810)));
+    }
+    @Test
+    void new_buy_order_fails_at_initial_matching_and_stays_in_order_book(){
+        Order order = new Order(11, security, Side.BUY, 300, 15790, buyerBroker, shareholder);
+        MatchResult matchResult = matcher.execute(order);
+        assertThat(buyerBroker.getCredit()).isEqualTo(100_000_000L - (300*15790));
+        assertThat(sellerBroker.getCredit()).isEqualTo(100_000_000L);
+    }
+    @Test
+    void new_buy_order_fails_after_matching_partially_with_first_sell_order_by_remainder(){
+        Order order = new Order(11, security, Side.BUY, 100000, 15800, buyerBroker, shareholder);
+        MatchResult matchResult = matcher.execute(order);
+        assertThat(matchResult.outcome()).isEqualTo(MatchResult.notEnoughCredit().outcome());
+        assertThat(buyerBroker.getCredit()).isEqualTo(100_000_000L);
+        assertThat(sellerBroker.getCredit()).isEqualTo(100_000_000L);
+    }
+    @Test
+    void new_sell_order_fails_at_initial_matching(){
+        EnterOrderRq newRq = EnterOrderRq.createNewOrderRq(1, security.getIsin(), 11, LocalDateTime.now(), Side.SELL, 101_000, 15800, 0, 0, 0);
+        MatchResult matchResult = security.newOrder(newRq, sellerBroker, shareholder, matcher);
+        assertThat(matchResult.outcome()).isEqualTo(MatchResult.notEnoughPositions().outcome());
+        assertThat(buyerBroker.getCredit()).isEqualTo(100_000_000L);
+        assertThat(sellerBroker.getCredit()).isEqualTo(100_000_000L);
     }
 }
